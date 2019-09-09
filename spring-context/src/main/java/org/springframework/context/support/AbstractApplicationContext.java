@@ -514,11 +514,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
+		// TODO：容器的创建入口
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 这里，将获取刷新后的BeanFactory，配置文件中的，配置，都已经解析后，加载到BeanFactroy里面了。
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
@@ -528,10 +530,28 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
 
+				/* ---------------------------------------------------------------------------------------------- */
 				// Invoke factory processors registered as beans in the context.
+				/**
+				 * 这个方法很重要：
+				 * 主要是获取实现 BeanFactoryPostProcessor 接口的子类。
+				 * 并执行这些子类的postProcessBeanFactory方法。
+				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
+				/* ---------------------------------------------------------------------------------------------- */
 				// Register bean processors that intercept bean creation.
+				/**
+				 * 把BeanPostProcessor接口的子类，都拉出来，
+				 * 通过 beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);的方式，获取。
+				 * 然后把这些都注册到BeanFactory的beanPostProcessors变量中。
+				 *
+				 * BeanFactory这个功能的入口：
+				 * 		@see org.springframework.beans.factory.config.ConfigurableBeanFactory#addBeanPostProcessor(org.springframework.beans.factory.config.BeanPostProcessor)
+				 * 具体的放入postProcessors的实现，通过Delegate模式来实现的
+				 * 		@see PostProcessorRegistrationDelegate#registerBeanPostProcessors(org.springframework.beans.factory.config.ConfigurableListableBeanFactory, org.springframework.context.support.AbstractApplicationContext)
+				 *
+				 * */
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -540,13 +560,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
+
 				// Initialize other special beans in specific context subclasses.
+				/**
+				 * Springboot中，启动EmbededTomcat，就是在这里方法的之类实现的。
+				 */
 				onRefresh();
 
 				// Check for listener beans and register them.
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
+				/**
+				 * 开始实例化Bean
+				 * */
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.

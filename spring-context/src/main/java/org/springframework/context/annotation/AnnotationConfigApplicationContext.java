@@ -95,6 +95,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
+		// 扫完了，把Bean都放哪里了？
 		scan(basePackages);
 		refresh();
 	}
