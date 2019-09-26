@@ -95,7 +95,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
-		// 扫完了，把Bean都放哪里了？
+		/**
+		 *
+		 * 构造函数，直接调用AnnotationConfigRegistry的scan方法，进行扫描。
+		 * 扫完了，就refresh了。
+		 */
 		scan(basePackages);
 		refresh();
 	}

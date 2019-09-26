@@ -79,7 +79,11 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	/** We use a static Log to avoid serialization issues */
 	private static final Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
 
-	/** Config used to configure this proxy */
+	/**
+	 * Proxy的配置信息，这里主要提供Advisor列表，并用于返回AdviceChain
+	 * Config used to configure this proxy
+	 *
+	 * */
 	private final AdvisedSupport advised;
 
 	/**
@@ -94,6 +98,11 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 
 	/**
+	 *
+	 * TODO：
+	 * 注意，这里是创建的入口，主要在 {@link DefaultAopProxyFactory }这个类里创建的。
+	 *
+	 *
 	 * Construct a new JdkDynamicAopProxy for the given AOP configuration.
 	 * @param config the AOP configuration as AdvisedSupport object
 	 * @throws AopConfigException if the config is invalid. We try to throw an informative
@@ -107,7 +116,11 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		this.advised = config;
 	}
 
-
+	/**
+	 * 返回调用的代理对象
+	 * TODO：
+	 * @return
+	 */
 	@Override
 	public Object getProxy() {
 		return getProxy(ClassUtils.getDefaultClassLoader());
@@ -119,7 +132,9 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			logger.debug("Creating JDK dynamic proxy: target source is " + this.advised.getTargetSource());
 		}
 		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised, true);
+
 		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
+
 		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);
 	}
 
@@ -194,6 +209,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			Class<?> targetClass = (target != null ? target.getClass() : null);
 
 			// Get the interception chain for this method.
+			// TODO ：获取当前方法的拦截链
 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 
 			// Check whether we have any advice. If we don't, we can fallback on direct

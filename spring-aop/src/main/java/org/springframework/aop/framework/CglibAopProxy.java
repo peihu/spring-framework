@@ -31,7 +31,6 @@ import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.PointcutAdvisor;
@@ -155,6 +154,14 @@ class CglibAopProxy implements AopProxy, Serializable {
 		return getProxy(null);
 	}
 
+	/**
+	 * TODO 这里是Cglib在创建自己的代理对象的地方
+	 *
+	 *
+	 * @param classLoader the class loader to create the proxy with
+	 * (or {@code null} for the low-level proxy facility's default)
+	 * @return
+	 */
 	@Override
 	public Object getProxy(@Nullable ClassLoader classLoader) {
 		if (logger.isDebugEnabled()) {
@@ -165,14 +172,14 @@ class CglibAopProxy implements AopProxy, Serializable {
 			Class<?> rootClass = this.advised.getTargetClass();
 			Assert.state(rootClass != null, "Target class must be available for creating a CGLIB proxy");
 
-			Class<?> proxySuperClass = rootClass;
-			if (ClassUtils.isCglibProxyClass(rootClass)) {
-				proxySuperClass = rootClass.getSuperclass();
-				Class<?>[] additionalInterfaces = rootClass.getInterfaces();
-				for (Class<?> additionalInterface : additionalInterfaces) {
-					this.advised.addInterface(additionalInterface);
-				}
-			}
+            Class<?> proxySuperClass = rootClass;
+            if (ClassUtils.isCglibProxyClass(rootClass)) {
+                proxySuperClass = rootClass.getSuperclass();
+                Class<?>[] additionalInterfaces = rootClass.getInterfaces();
+                for (Class<?> additionalInterface : additionalInterfaces) {
+                    this.advised.addInterface(additionalInterface);
+                }
+            }
 
 			// Validate the class, writing log messages as necessary.
 			validateClassIfNecessary(proxySuperClass, classLoader);
